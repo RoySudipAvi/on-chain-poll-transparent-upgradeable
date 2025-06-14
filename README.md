@@ -2,6 +2,18 @@
 A fully on-chain, upgradeable polling and voting platform built with Solidity 0.8.28 and Foundry.
 Anyone can create a poll, set custom ERC20 eligibility for voters, and users vote on-chain. Voting logic is upgradeable using OpenZeppelin’s Transparent Proxy pattern
 
+**BASE sepolia deployed contracts**
+
+> ERC20 token : 0x692d0752DbBea2EFf4436a184D4b848Be6eb4db6
+>
+> Poll Creation : 0x3b9D9ee856C0b9F97fE4c04208B3FB9b59837a11
+>
+> VotingV1 : 0xb79E2c4cB50F3e6c893EF6A6163e4F77e932887B
+>
+> Proxy : 0x9e00b3571b47bA228205D05C3B5bAB757B669487
+>
+> VotingV2 : 0x0126100CDc3c1a78b98BE4a8756520B4601B1481
+
 ### Features:
 
 **Any ERC20-Backed Polls**

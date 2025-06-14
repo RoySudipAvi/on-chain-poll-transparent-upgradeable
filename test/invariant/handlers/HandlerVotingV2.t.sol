@@ -5,13 +5,12 @@ import {Test, console} from "forge-std/Test.sol";
 import {IPoll} from "src/interfaces/IPoll.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract HandlerVotingV1 is Test {
+contract HandlerVotingV2 is Test {
     address private s_pollCreationFactory;
     address private s_proxy;
     address private s_token;
+    uint256 private s_totalERC20Balance;
     uint256 private s_totalVoters;
-    uint256 private s_totalVotersERC20Balance;
-    address private s_implementation;
 
     constructor(address erc20, address proxy, address pollCreationFactory) {
         s_pollCreationFactory = pollCreationFactory;
@@ -24,9 +23,10 @@ contract HandlerVotingV1 is Test {
         IPoll.Poll memory poll = IPoll(s_pollCreationFactory).getPollById(pollId);
         optionIndex = bound(optionIndex, 0, poll.options.length);
         timestamp = bound(timestamp, poll.startTime, poll.endTime);
+        console.log("timestamp: ", timestamp);
         vm.warp(timestamp);
         vm.assume(voter != address(0));
-        deal(s_token, voter, 5e18);
+        deal(s_token, voter, 8e18);
         (bool success, bytes memory data) =
             s_proxy.call(abi.encodeWithSignature("hasUserVoted(address,uint256)", voter, pollId));
         if (success) {
@@ -35,15 +35,14 @@ contract HandlerVotingV1 is Test {
                 vm.prank(voter);
                 (bool successVote,) =
                     s_proxy.call(abi.encodeWithSignature("vote(uint256,uint256)", pollId, optionIndex));
-                s_totalVoters = successVote ? s_totalVoters + 1 : s_totalVoters;
+                if (successVote) {
+                    s_totalVoters += 1;
+                    s_totalERC20Balance += IERC20(s_token).balanceOf(voter);
+                }
             }
         } else {
             return;
         }
-    }
-
-    function updateImplementation(address implementation) external {
-        s_implementation = implementation;
     }
 
     function getTotalVoters() external view returns (uint256) {
@@ -51,10 +50,6 @@ contract HandlerVotingV1 is Test {
     }
 
     function getTotalVotersERC20Balance() external view returns (uint256) {
-        return s_totalVotersERC20Balance;
-    }
-
-    function getImplementationAddress() external view returns (address) {
-        return s_implementation;
+        return s_totalERC20Balance;
     }
 }
